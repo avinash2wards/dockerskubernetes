@@ -1,0 +1,150 @@
+docker pull <images-name> ; only downloads the specified image to locally. Will not run the container
+docker ps ; lists all the running docker containers only
+docker ps -a ; lists all the running docker containers + previously stopped or exited containers
+docker stop <container-names-or-ids> ; stops or force kill a particular containers
+docker rm <container-names-or-ids> ; removes or deletes a particular containers
+docker images ; lists all the downloaded or local docker images.
+docker rmi <image-names-or-ids> ; removes or deletes a particular docker images. Note: all the containers using the should be removed before removing the image. stopping the container is NOT enough.
+
+docker exec <container-id> <commands-to-run-inside-docker-container> ; AFTER RUNNING a container, now, we want to go inside the conatiner and exceute few commands, we use exec. Ex, let's say we are RUNNING unbuntu image, docker exec ae04953403 cat /etc/*release ; tosee this which version of OS running 
+
+docker attach <container-id> ; bring the the container runing in the backgroud to foreground. so now our terminal is stuck.
+
+docker inspect <container-id> ; it shows complete detials of docker containe such as IP adress, storeage paths, status etc.
+
+docker run <images-name> <commands-related-to-image> ;runs a container using specified image
+
+--name ; name of the container to use it in any subsequent commands.
+
+-it ; automatically logs in inside container, if image is OS.
+
+-d ; d-detached mode, runs container in background, i.e. getting back to terminal, so I can run other commands 
+docker attach <container-id> ; bring the the container runing in the backgroud to foreground. so now our terminal is stuck.
+
+-i ; i-interactive, container runs in interactive mode
+
+-t ; t-terminal, this show us terminal of container and can take STDIN inputs & STDOUT to/from host OS terminal. In other words, attaching docker termial to host OS terminal.
+
+-it ;together make container as interactive and takes accepts inputs and outputs the data in terminal.
+
+-p <host-port:container-port> ; p-port,for port mapping from docker host port OS to container port. Ex docker run -p 8000:8080 jenkins,here when acccess 8000 port in my docker OS, that will redirected to container with 8080 port.
+
+-v ; v-volume. By default docker container stores its data (jenkins, mysql data file etc) at /var/somename/ inside the container, everytime container removed, all the data has been destryoed. In order to persist the data out side the container, we can use -v like this, docker run -p 8080:8080  -v /your/home:/var/jenkins_home jenkins. Next time when we run the container, instead of creating the data from scratch, it optinally use this path, if mentioned while running.
+
+-e ; e-environmental variables; to set environmental variables like, docker run -e APP_URL=http://example.cpom <image-name>
+
+-entrypoint; to override the value of ENTRYPOINT in Dockerfile.
+
+
+docker build <docker-dir-name> -t <name-of-images>:<tag> ; to build the custom images
+-t or --tag ; name of the image with tag
+
+Dockerfile: an, example,
+***************************************
+FROM ubuntu:18.04
+
+RUN apt-get update
+RUN apt-get install -y python
+RUN apt-get install -y python-pip
+RUN pip install Flask
+
+COPY app.py /opt/app.py
+
+ENTRYPOINT FLASK_APP=/opt/app.py flask run --host=0.0.0.0
+************************************************************
+
+docker login -u asdsasdfs -p sdfsdfs ; logins to docker-hub
+docker push <accunt/images-name> ; push the image to docker hub
+
+****************************************
+Dockerfile
+
+CMD <command> <param1> ; ex, CMD sleep 5
+CMD ["<command>", "<param1>"]. Ex, CMD ["sleep","5"]
+
+How to override the CMD, ex, docker run ubuntu sleep 100
+
+ENTRYPOINT ;ex, ENTRYPOINT ["sleep"] this is same as CMD, it starts the mentioned program when the container starts. but is appends the CMD instruction.
+NOTE: if CMD instruction also presents at terminal or Dockerfile then, its becomes ENTRYPOINT value + CMD Value,
+ex,
+FROM ubuntu
+CMD ["5"] or it was passed from termial like docker run ubuntu 5
+ENTRYPOINT ["sleep"]	
+then, whole instrction or command to issue will become => sleep 5
+
+****************************************
+
+docker-compose
+
+docker-compose up ; to spin up all the containers in yaml file
+
+docker-compose.yml content, redis,db, vote and worker are containers name
+**********************************
+redis: 
+ image: redis
+
+db: 
+ image: postgres:9.4
+ environment: 
+  POSTGRES_HOST_AUTH_METHOD: trust
+
+vote: 
+ image: voting-app
+ ports:
+  - 5000:80
+ links:
+  - redis
+
+worker: 
+ image: worker-app
+ links:
+  - db
+  - redis    
+
+result: 
+ image: result-app
+ ports:
+  - 5001:80
+ links:
+  - db
+*************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
